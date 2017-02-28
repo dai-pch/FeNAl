@@ -11,6 +11,11 @@ Flags about excited numerical algorithm.
 - Tests for these method above.
 - Remainder-theorem implementation.
 
+## Requirements
+- This project using c++17 charactoristics.
+- CMake version >= 3.8.0
+- VS2015 rc2 or later; GCC 6.1 or later; Clang 4.0 or later.
+
 ## Build
 - Make a new directories "build" in the FeNAl folder and enter.
 - Run command "cmake ..".
