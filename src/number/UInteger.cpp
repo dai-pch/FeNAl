@@ -225,7 +225,7 @@ namespace Number {
 
 	char NumberToChar(const unsigned ch)
 	{
-		if (ch >= 0 && ch < 10)
+		if (ch < 10)
 			return (static_cast<char>(ch) + '0');
 		else if (ch >= 10 && ch <= 15)
 			return (static_cast<char>(ch) + 'A' - 10);
