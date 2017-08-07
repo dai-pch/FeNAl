@@ -5,13 +5,16 @@ using namespace Number;
 
 TEST_CASE("Test initialize of Matrix", "[Initialize][Matrix]") {
 	std::vector<double> number(16);
+    std::vector<int> number2{1, 0, 0, 0, 1, 0, 0, 0, 1};
 
 	//REQUIRE(Integer() == 0);
     Matrix<int> a;
     Matrix<double> b(3, 3);
     Matrix<double> c(4, 4, number);
     REQUIRE(Matrix<int>(4, 4) == Matrix<int>(4, 4));
-    
+    auto d = Matrix<int>::ones(3);
+    REQUIRE(d == Matrix<int>(3, 3, number2));
+    auto f = Matrix<double>::ones(5);
 }
 
 TEST_CASE("Test assign of Matrix", "[Assign][Matrix]") {
@@ -70,4 +73,20 @@ TEST_CASE("Test transpose of Matrix", "[Transpose][Matrix]") {
     REQUIRE(a.transpose() == b);
     REQUIRE(a == b.transpose());
     REQUIRE(a.transpose().transpose() == a);
+}
+
+TEST_CASE("Test reverse of Matrix", "[Reverse][Matrix]") {
+	std::vector<double> number1{1, 2, 5, 9};
+    //std::vector<double> number1{1, 0, 0, 2};
+
+    Matrix<double> a(2, 2, number1);
+    Matrix<double> b, c, d;
+
+    b = a.reverse();
+    c = b.reverse();
+    d = a * b;
+
+    REQUIRE((c - a).abs() < 0.001);
+    REQUIRE(a * b == Matrix<double>::ones(2));
+    REQUIRE(b * a == Matrix<double>::ones(2));
 }
