@@ -44,6 +44,8 @@ namespace Number{
 
     public:
         friend std::ostream& operator<< <> (std::ostream& os, const Matrix<T>& m);
+        size_t rows() const;
+        size_t cols() const;
 
     private:
         template <typename U> void copy_from(const Matrix<U>& m);
@@ -254,6 +256,13 @@ namespace Number{
         }
         
         return res;
+    }
+
+    template <typename T> size_t Matrix<T>::rows() const{
+        return _rows;
+    }
+    template <typename T> size_t Matrix<T>::cols() const{
+        return _cols;
     }
 
 } // namespace Number
