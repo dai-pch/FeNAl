@@ -4,9 +4,8 @@
 #include "number/Matrix.h"
 
 namespace SigPro {
-    using DT = double;
     class KalmanFilter {
-
+    using DT = double;
     public:
         KalmanFilter(const Number::Matrix<DT>& init_state, const Number::Matrix<DT>& state_covariance,
             const Number::Matrix<DT>& transition, const Number::Matrix<DT>& process_covariance,

@@ -5,11 +5,13 @@ using namespace std;
 using namespace Number;
 
 namespace SigPro {
-    KalmanFilter::KalmanFilter(const Number::Matrix<DT>& init_state,
-        const Number::Matrix<DT>& state_covariance,
-        const Number::Matrix<DT>& transition, const Number::Matrix<DT>& process_covariance,
-        const Number::Matrix<DT>& observation, const Number::Matrix<DT>& observation_covariance,
-        const Number::Matrix<DT>& controlling): _state(init_state),
+    KalmanFilter::KalmanFilter(const Number::Matrix<KalmanFilter::DT>& init_state,
+        const Number::Matrix<KalmanFilter::DT>& state_covariance,
+        const Number::Matrix<KalmanFilter::DT>& transition, 
+        const Number::Matrix<KalmanFilter::DT>& process_covariance,
+        const Number::Matrix<KalmanFilter::DT>& observation, 
+        const Number::Matrix<KalmanFilter::DT>& observation_covariance,
+        const Number::Matrix<KalmanFilter::DT>& controlling): _state(init_state),
         _state_covariance(state_covariance), _transition(transition),
         _process_covariance(process_covariance), _observation(observation),
         _observation_covariance(observation_covariance), _controlling(controlling) {
@@ -52,11 +54,11 @@ namespace SigPro {
         _state_covariance = _state_covariance - K * _observation * _state_covariance;
     }
 
-    Number::Matrix<DT> KalmanFilter::state() const {
+    Number::Matrix<KalmanFilter::DT> KalmanFilter::state() const {
         return _state;
     }
 
-    Number::Matrix<DT> KalmanFilter::covariance() const {
+    Number::Matrix<KalmanFilter::DT> KalmanFilter::covariance() const {
         return _state_covariance;
     }
 } //namespace SigPro
