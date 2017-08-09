@@ -4,6 +4,8 @@
 
 #include "Number.h"
 #include <functional>
+#include <vector>
+#include <complex>
 
 namespace Number {
 
@@ -90,6 +92,88 @@ namespace Number {
 		DataType S = _simpson(b - a, f_a, f_c, f_b);
 		return _adaptiveSimpson<MaxTime>(F, a, c, b, f_a, f_c, f_b, S, err, 0);
 	}
-}
 
-#endif
+	inline size_t _fft_reverse(size_t a, unsigned n) {
+		if (n == 1)
+			return a;
+		unsigned n_l = n/2;
+		unsigned n_r = n - n_l;
+		size_t l = (a >> n_r) & ((1 << n_l) - 1);
+		size_t r = a & ((1 << n_r) - 1);
+		return (_fft_reverse(r, n_r) << n_l) | _fft_reverse(l, n_l);
+	}
+
+	inline void _fft_size(size_t src_len, size_t& length, unsigned& n) {
+		assert(src_len >= 2);
+		// calc length
+		length = 2;
+		n = 1;
+		while (length < src_len) {
+			length *= 2;
+			n += 1;
+		}
+	}
+
+	template <typename T>
+	void _fft(std::vector<std::complex<T>>& res, size_t length) {
+		const double pi = 3.141592653589793238462;
+		// calc W
+		static std::vector<std::complex<T>> W;
+		if (W.size() * 2 < length){
+			W.clear();
+			W.reserve(length/2);
+			for (size_t ii=0;ii<length/2;++ii){
+				T theta = pi * ii / (length / 2);
+				W.push_back(std::complex<T>(cos(theta), -sin(theta)));
+			}
+		}
+
+		// fft
+		for (size_t p = 2;p <= length;p *= 2) {
+			for (size_t q =0;q<length;q+=p) {
+				for (size_t ii=0;ii<p/2;++ii) {
+					auto W_ = W[ii * (W.size() * 2 / p)]; // W_p^ii
+					auto temp = res[q + ii];
+					auto temp2 = res[q + p/2 + ii] * W_;
+					res[q + ii] = temp + temp2;
+					res[q + p/2 + ii] = temp - temp2;
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	std::vector<std::complex<T>> FFT(const std::vector<T>& src) {
+		size_t length;
+		unsigned n;
+		_fft_size(src.size(), length, n);
+		// resort
+		std::vector<std::complex<T>> res(length);
+		for (unsigned ii=0;ii<length;++ii) {
+			auto des = _fft_reverse(ii, n);
+			res[des] = std::complex<T>(src[ii], 0);
+		}
+
+		_fft(res, length);
+		return res;
+	}
+	template <typename T>
+	std::vector<T> IFFT(const std::vector<std::complex<T>>& src) {
+		size_t length;
+		unsigned n;
+		_fft_size(src.size(), length, n);
+		// resort
+		std::vector<std::complex<T>> conject(length);
+		for (unsigned ii=0;ii<length;++ii)
+			conject[_fft_reverse(ii, n)] = std::conj(src[ii]);
+		
+		_fft(conject, length);
+		std::vector<T> res(length);
+		for (unsigned ii=0;ii<length;++ii)
+			res[ii] = conject[ii].real() / length;
+		return res;
+	}
+
+} // namespace Number
+
+#endif // _NUMBER_ALGRM_H
