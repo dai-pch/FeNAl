@@ -43,6 +43,19 @@ TEST_CASE("Test FFT profile", "[FFT][Algorithm][profile]") {
         src_f[ii] = cos(omega * ii);
     }
 
+    {
+        RunningTime timer("Blank baseline.");
+    }
+    //initialization
+    {
+        RunningTime timer("1024 point double FFT");
+        auto fft = FFT(src);
+    }
+    {
+        RunningTime timer("1024 point float FFT");
+        auto fft = FFT(src_f);
+    }
+
     TestSpeed fft_d(
         [&](){auto res = FFT(src); return res[0].real();},
         1000, "1024 point double FFT");
@@ -51,16 +64,4 @@ TEST_CASE("Test FFT profile", "[FFT][Algorithm][profile]") {
         [&](){auto res = FFT(src_f); return res[0].real();},
         1000, "1024 point double FFT");
     fft_f.test();
-
-    // {
-    //     RunningTime timer("1024 point double FFT");
-    //     auto fft = FFT(src);
-    // }
-    // {
-    //     RunningTime timer("1024 point float FFT");
-    //     auto fft = FFT(src_f);
-    // }
-    {
-        RunningTime timer("Blank baseline.");
-    }
 }
