@@ -167,7 +167,7 @@ namespace Number {
 			res[1] = temp - temp2;
 		}
 	};
-	
+
 	template <typename T>
 	struct _calc_radix2_fft<T, 4> {
 		inline static void calc(std::complex<T>* res, const std::vector<std::complex<T>>& W) {
@@ -176,8 +176,8 @@ namespace Number {
 			auto x1 = res[1];
 			auto x2 = res[2];
 			auto x3 = res[3];
-			auto x2i = i * x2;
-			auto x3i = i * x3;
+			auto x2i = std::complex<T>(-x2.imag(), x2.real());
+			auto x3i = std::complex<T>(-x3.imag(), x3.real());
 			res[0] = x0 + x1 + x2 + x3;
 			res[1] = x0 - x1 - x2i + x3i;
 			res[2] = x0 + x1 - x2 - x3;
