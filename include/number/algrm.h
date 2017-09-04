@@ -129,7 +129,7 @@ namespace Number {
 		}
 
 		// fft inplace
-		for (size_t p = 8;p <= length;p *= 2) {
+		for (size_t p = 2;p <= length;p *= 2) {
 			for (size_t q =0;q<length;q+=p) {
 				for (size_t ii=0;ii<p/2;++ii) {
 					auto W_ = W[ii * (W.size() * 2 / p)]; // W_p^ii
@@ -176,14 +176,90 @@ namespace Number {
 			auto x1 = res[1];
 			auto x2 = res[2];
 			auto x3 = res[3];
-			auto x1i = i * x0;
+			auto x2i = i * x2;
 			auto x3i = i * x3;
 			res[0] = x0 + x1 + x2 + x3;
-			res[1] = x0 - x1i - x2 + x3i;
-			res[2] = x0 - x1 + x2 - x3;
-			res[3] = x0 + x1i - x2 - x3i;
+			res[1] = x0 - x1 - x2i + x3i;
+			res[2] = x0 + x1 - x2 - x3;
+			res[3] = x0 - x1 + x2i - x3i;
 		}
 	};
+
+	template <typename T, unsigned Len>
+	inline void _radix2_fft_static(std::complex<T>* res) {
+		const double pi = 3.141592653589793238462;
+		// calc W
+		static std::vector<std::complex<T>> W;
+		if (W.size() < Len / 2){
+			W.clear();
+			W.reserve(Len/2);
+			for (size_t ii=0;ii<Len/2;++ii){
+				T theta = pi * ii / (Len / 2);
+				W.push_back(std::complex<T>(cos(theta), -sin(theta)));
+			}
+		}
+
+		// fft inplace
+		_calc_radix2_fft<T, Len>::calc(res, W);
+	}
+
+	template <size_t Len, typename T>
+	void FFT_static(std::complex<T>* res) {
+		unsigned n;
+		size_t length;
+		_fft_size(Len, length, n);
+		assert(length == Len);
+		// resort
+		for (unsigned ii=0;ii<Len;++ii) {
+			auto des = _fft_reverse(ii, n);
+			if (des > ii)
+				std::swap(res[des], res[ii]);
+		}
+
+		_radix2_fft_static<T, Len>(res);
+		return;
+	}
+	template <size_t Len, typename T>
+	void IFFT_static(std::complex<T>* res) {
+		unsigned n;
+		size_t length;
+		_fft_size(Len, length, n);
+		assert(length == Len);
+		//conj and scalar in
+		for (unsigned ii=0;ii<Len;++ii) {
+			res[ii] = std::conj(res[ii]) / static_cast<T>(Len);
+		}
+		// resort
+		for (unsigned ii=0;ii<Len;++ii) {
+			auto des = _fft_reverse(ii, n);
+			if (des > ii)
+				std::swap(res[des], res[ii]);
+		}
+		
+		_radix2_fft_static<T, Len>(res);
+	}
+
+	// template <size_t Len, typename T>
+	// std::vector<std::complex<T>> FFT_real_static(const std::vector<T>& src) {
+	// 	unsigned n;
+	// 	size_t length;
+	// 	_fft_size(Len, length, n);
+	// 	assert(length == Len);
+	// 	// resort
+	// 	std::complex<T>* res = new std::complex<T>[Len];
+	// 	for (unsigned ii=0;ii<Len;++ii) {
+	// 		auto des = _fft_reverse(ii, n);
+	// 		res[des] = std::complex<T>(src[ii], 0);
+	// 	}
+
+	// 	_radix2_fft_static<T, Len>(res);
+	// 	std::vector<std::complex<T>> ret(Len);
+	// 	for (int ii = 0;ii < Len;++ii)
+	// 		ret[ii] = res[ii];
+
+	// 	delete [] res;
+	// 	return ret;
+	// }
 
 	template <typename T>
 	std::vector<std::complex<T>> FFT(const std::vector<T>& src) {
