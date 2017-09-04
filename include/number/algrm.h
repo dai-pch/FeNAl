@@ -94,13 +94,13 @@ namespace Number {
 	}
 
 	inline size_t _fft_reverse(size_t a, unsigned n) {
-		if (n == 1)
-			return a;
-		unsigned n_l = n/2;
-		unsigned n_r = n - n_l;
-		size_t l = (a >> n_r) & ((1 << n_l) - 1);
-		size_t r = a & ((1 << n_r) - 1);
-		return (_fft_reverse(r, n_r) << n_l) | _fft_reverse(l, n_l);
+		size_t res = 0;
+		for (int ii = 0;ii < n;++ii) {
+			res <<= 1;
+			res |= a & 1;
+			a >>= 1;
+		}
+		return res;
 	}
 
 	inline void _fft_size(size_t src_len, size_t& length, unsigned& n) {
