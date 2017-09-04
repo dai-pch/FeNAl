@@ -115,7 +115,7 @@ namespace Number {
 	}
 
 	template <typename T>
-	void _radix2_fft(std::vector<std::complex<T>>& res, size_t length) {
+	inline void _radix2_fft(std::vector<std::complex<T>>& res, size_t length) {
 		const double pi = 3.141592653589793238462;
 		// calc W
 		static std::vector<std::complex<T>> W;
@@ -129,7 +129,7 @@ namespace Number {
 		}
 
 		// fft inplace
-		for (size_t p = 2;p <= length;p *= 2) {
+		for (size_t p = 8;p <= length;p *= 2) {
 			for (size_t q =0;q<length;q+=p) {
 				for (size_t ii=0;ii<p/2;++ii) {
 					auto W_ = W[ii * (W.size() * 2 / p)]; // W_p^ii
@@ -141,6 +141,49 @@ namespace Number {
 			}
 		}
 	}
+
+	template <typename T, unsigned Len>
+	struct _calc_radix2_fft{
+		inline static void calc(std::complex<T>* res, const std::vector<std::complex<T>>& W) {
+			constexpr unsigned Lend2 = Len / 2;
+			_calc_radix2_fft<T, Lend2>::calc(res, W);
+			_calc_radix2_fft<T, Lend2>::calc(res + Lend2, W);
+			for (size_t ii = 0;ii < Lend2;++ii) {
+				auto W_ = W[ii * (W.size() * 2 / Len)]; // W_p^ii
+				auto temp = res[ii];
+				auto temp2 = res[Lend2 + ii] * W_;
+				res[ii] = temp + temp2;
+				res[Lend2 + ii] = temp - temp2;
+			}
+		}
+	};
+
+	template <typename T>
+	struct _calc_radix2_fft<T, 2> {
+		inline static void calc(std::complex<T>* res, const std::vector<std::complex<T>>& W) {
+			auto temp = res[0];
+			auto temp2 = res[1];
+			res[0] = temp + temp2;
+			res[1] = temp - temp2;
+		}
+	};
+	
+	template <typename T>
+	struct _calc_radix2_fft<T, 4> {
+		inline static void calc(std::complex<T>* res, const std::vector<std::complex<T>>& W) {
+			std::complex<T> i(0, 1);
+			auto x0 = res[0];
+			auto x1 = res[1];
+			auto x2 = res[2];
+			auto x3 = res[3];
+			auto x1i = i * x0;
+			auto x3i = i * x3;
+			res[0] = x0 + x1 + x2 + x3;
+			res[1] = x0 - x1i - x2 + x3i;
+			res[2] = x0 - x1 + x2 - x3;
+			res[3] = x0 + x1i - x2 - x3i;
+		}
+	};
 
 	template <typename T>
 	std::vector<std::complex<T>> FFT(const std::vector<T>& src) {
