@@ -115,7 +115,7 @@ namespace Number {
 	}
 
 	template <typename T>
-	void _fft(std::vector<std::complex<T>>& res, size_t length) {
+	void _radix2_fft(std::vector<std::complex<T>>& res, size_t length) {
 		const double pi = 3.141592653589793238462;
 		// calc W
 		static std::vector<std::complex<T>> W;
@@ -128,7 +128,7 @@ namespace Number {
 			}
 		}
 
-		// fft
+		// fft inplace
 		for (size_t p = 2;p <= length;p *= 2) {
 			for (size_t q =0;q<length;q+=p) {
 				for (size_t ii=0;ii<p/2;++ii) {
@@ -154,7 +154,7 @@ namespace Number {
 			res[des] = std::complex<T>(src[ii], 0);
 		}
 
-		_fft(res, length);
+		_radix2_fft(res, length);
 		return res;
 	}
 	template <typename T>
@@ -167,7 +167,7 @@ namespace Number {
 		for (unsigned ii=0;ii<length;++ii)
 			conject[_fft_reverse(ii, n)] = std::conj(src[ii]);
 		
-		_fft(conject, length);
+		_radix2_fft(conject, length);
 		std::vector<T> res(length);
 		for (unsigned ii=0;ii<length;++ii)
 			res[ii] = conject[ii].real() / length;
