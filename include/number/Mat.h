@@ -14,6 +14,15 @@ namespace Number{
     template <typename T, size_t M, size_t N>
     std::ostream& operator<<(std::ostream& os, const Mat<T, M, N>& m);
 
+    template <typename T, size_t M>
+    CVec = Mat<T, M, 1>;
+
+    template <typename T, size_t N>
+    RVec = Mat<T, 1, N>;
+
+    template <typename T, size_t M>
+    Vec = CVec<T, M>;
+
     template <typename T, size_t M, size_t N> 
     class Mat {
         template <typename T1, size_t M1, size_t N1> friend class Mat;
