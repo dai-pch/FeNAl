@@ -15,13 +15,32 @@ namespace Number{
     std::ostream& operator<<(std::ostream& os, const Mat<T, M, N>& m);
 
     template <typename T, size_t M>
-    CVec = Mat<T, M, 1>;
+    using CVec = Mat<T, M, 1>;
 
     template <typename T, size_t N>
-    RVec = Mat<T, 1, N>;
+    using RVec = Mat<T, 1, N>;
 
     template <typename T, size_t M>
-    Vec = CVec<T, M>;
+    using Vec = CVec<T, M>;
+
+    template <typename T, typename U, size_t M, size_t N1, size_t N2,
+        typename...Others, typename R = decltype(T() + U()), size_t N = N1 + N2>
+    auto concat(const Mat<T, M, N1> m1, const Mat<U, M, N2> m2, Others... res) {
+        Mat<R, M, N> t;
+        for (int row=0;row<M;++row)
+            for (int col=0;col<N;++col)
+                t(row, col) = (col < N1) ? m1(row, col) : m2(row, col - N1);
+        return concat(t, res...);
+    }
+    template <typename T, typename U, size_t M, size_t N1, size_t N2,
+        typename R = decltype(T() + U()), size_t N = N1 + N2>
+    auto concat(const Mat<T, M, N1> m1, const Mat<U, M, N2> m2) {
+        Mat<R, M, N> t;
+        for (int row=0;row<M;++row)
+            for (int col=0;col<N;++col)
+                t(row, col) = (col < N1) ? m1(row, col) : m2(row, col - N1);
+        return t;
+    }
 
     template <typename T, size_t M, size_t N> 
     class Mat {
@@ -31,6 +50,8 @@ namespace Number{
         Mat() {}
         template <typename U>
         Mat(const std::vector<U>& contents);
+        template <typename... U>
+        Mat(U... init): _num{init...} {}
         template <typename U> Mat(const Mat<U, M, N>& m);
         static Mat ones();
 

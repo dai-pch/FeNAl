@@ -11,10 +11,17 @@ TEST_CASE("Test initialize of Mat", "[Initialize][Mat]") {
     Mat<int, 6, 6> a;
     Mat<double, 3, 3> b;
     Mat<double, 4, 4> c(number);
+    Mat<int, 3, 3> d = {1, 0, 0, 0, 1, 0, 0, 0, 1};
     REQUIRE((Mat<int, 4, 4>()) == (Mat<int, 4, 4>()));
-    auto d = Mat<int, 3, 3>::ones();
+    auto e = Mat<int, 3, 3>::ones();
     REQUIRE(d == (Mat<int, 3, 3>(number2)));
+    REQUIRE(e == (Mat<int, 3, 3>(number2)));
     auto f = Mat<double, 5, 3>::ones();
+    Vec<int, 3> g1 = {1, 0, 0};
+    Vec<int, 3> g2 = {0, 1, 0};
+    Vec<double, 3> g3 = {0.0, 0.0, 1.0};
+    auto g = concat(g1, g2, g3);
+    REQUIRE(g == (Mat<int, 3, 3>(number2)));
 }
 
 TEST_CASE("Test assign of Mat", "[Assign][Mat]") {
