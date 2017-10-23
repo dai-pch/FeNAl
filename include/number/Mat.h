@@ -37,6 +37,8 @@ namespace Number{
     public:
         T& operator()(size_t row, size_t col);
         T operator()(size_t row, size_t col) const;
+        T& operator[](size_t n);
+        T operator[](size_t n) const;
         Mat transpose() const;
         template <typename U = decltype((double)1.0/T())>
         Mat<U, M, N> reverse() const;
@@ -120,6 +122,15 @@ namespace Number{
     T Mat<T, M, N>::operator()(size_t row, size_t col) const {
         size_t posi = row * N + col;
         return _num[posi];
+    }
+
+    template <typename T, size_t M, size_t N>
+    T& Mat<T, M, N>::operator[](size_t n) {
+        return _num[n];
+    }
+    template <typename T, size_t M, size_t N>
+    T Mat<T, M, N>::operator[](size_t n) const {
+        return _num[n];
     }
 
     template <typename T, size_t M, size_t N> template <typename U>
